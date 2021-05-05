@@ -10,13 +10,14 @@ def is_open(df_timetables, site_id, time):
         site_opening_datetime = row['opening_datetime']
         site_closing_datetime = row['closing_datetime']
     return (time > site_opening_datetime) & (time < site_closing_datetime)
-# load data
-fp_data = '/home/amait/Téléchargements/Test_technique_data_engineer_Affluences/data.csv'
-data = pd.read_csv(fp_data, delimiter=',')
-fp_time = '/home/amait/Téléchargements/Test_technique_data_engineer_Affluences/timetables.csv'
-timetables = pd.read_csv(fp_time, delimiter=',')
 
 def main():
+    # load data
+    fp_data = '/home/amait/Téléchargements/Test_technique_data_engineer_Affluences/data.csv'
+    data = pd.read_csv(fp_data, delimiter=',')
+    fp_time = '/home/amait/Téléchargements/Test_technique_data_engineer_Affluences/timetables.csv'
+    timetables = pd.read_csv(fp_time, delimiter=',')
+    
     # copy
     df_data = data.copy()
     df_timetables = timetables.copy()

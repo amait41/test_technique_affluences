@@ -6,10 +6,11 @@ warnings.simplefilter("ignore")
 def is_open(df_timetables, site_id, time):
     "Check if site is open"
     site = df_timetables[df_timetables.site_id == site_id]
-    for index, row in df_timetables.iterrows():
+    for index, row in site.iterrows():
         site_opening_datetime = row['opening_datetime']
         site_closing_datetime = row['closing_datetime']
-    return (time > site_opening_datetime) & (time < site_closing_datetime)
+        ids = row["site_id"]
+    return (time > site_opening_datetime) and (time < site_closing_datetime)
 
 def main():
     # load data
@@ -33,12 +34,12 @@ def main():
 
     # add alert column
     df_data['alert'] = time - df_data.last_record_datetime
-    mask0 = df_data.last_record_datetime2 < pd.to_timedelta("0 days 02:00:00.00000")
-    mask1 = (df_data.last_record_datetime2 >= pd.to_timedelta("0 days 02:00:00.00000")) & \
+    mask0 = (df_data.last_record_datetime2 < pd.to_timedelta("0 days 02:00:00.00000"))
+    mask1 = (df_data.last_record_datetime2 > pd.to_timedelta("0 days 02:00:00.00000")) & \
             (df_data.last_record_datetime2 < pd.to_timedelta("1 days 00:00:00.00000"))
-    mask2 = (df_data.last_record_datetime2 >= pd.to_timedelta("1 days 00:00:00.00000")) & \
+    mask2 = (df_data.last_record_datetime2 > pd.to_timedelta("1 days 00:00:00.00000")) & \
             (df_data.last_record_datetime2 < pd.to_timedelta("2 days 00:00:00.00000"))
-    mask3 = df_data.last_record_datetime2 >= pd.to_timedelta("2 days 00:00:00.00000")
+    mask3 = (df_data.last_record_datetime2 > pd.to_timedelta("2 days 00:00:00.00000"))
     df_data.loc[:,'alert'].loc[mask0] = 0
     df_data.loc[:,'alert'].loc[mask1] = 1
     df_data.loc[:,'alert'].loc[mask2] = 2
@@ -51,9 +52,7 @@ def main():
     for index, row in df_data.iterrows():
         site_id = row['site_id']
         if is_open(df_timetables, site_id, time):
-            res += f"Sensor {row['sensor_name']} with identifier {row['sensor_identifier']} \
-                triggers an alert at {time} with level {row['alert']} with last data recorded \
-                at {row['last_record_datetime']}\n"
+            res += f"Sensor {row['sensor_name']} with identifier {row['sensor_identifier']} triggers an alert at {time} with level {row['alert']} with last data recorded at {row['last_record_datetime']}.\n"
     
     if len(res) == 0:
         print("Pas d'anomalie.")
